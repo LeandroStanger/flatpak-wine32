@@ -147,3 +147,6 @@ sudo flatpak install flathub org.freedesktop.Platform.GL32.nvidia-460-39
 #or
 sudo flatpak install flathub org.freedesktop.Platform.GL32
 ```
+
+### To stop / kill a flapak running program, if it hangs; like killall -KILL <program name>
+` flatpak kill io.github.flatpak-wine32`
