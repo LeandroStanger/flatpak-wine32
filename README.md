@@ -13,6 +13,7 @@ sha256sum io.github.flatpak-wine32.flatpak ; #check sum below
 `209878a1a9b58fa147d49e639499cb0f1fcde398eafbbbfe98af97dceb8d3397  io.github.flatpak-wine32.flatpak`
 
 ```
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo -y
 # Install required runtime, see bottom for nvidia GPU
 sudo flatpak install                                               \
 org.freedesktop.Platform/x86_64/20.08                              \
