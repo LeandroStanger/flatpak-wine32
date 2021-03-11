@@ -12,7 +12,7 @@ jobs:
       options: --privileged
     steps:
     - uses: actions/checkout@v2
-    - uses: bilelmoussaoui/flatpak-github-actions@v2
+    - uses: LeandroStanger/flatpak-github-actions
       with:
         bundle: "Proton-6.1-GE-2.flatpak"
         manifest-path: "io.github.Proton-6.1-GE-2-wine.yml"
