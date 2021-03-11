@@ -6,6 +6,7 @@ name: CI
 jobs:
   flatpak-builder:
     name: "Flatpak Builder"
+    run: flatpak install -y flathub org.freedesktop.Sdk.Compat.i386//20.08 org.freedesktop.Sdk.Extension.toolchain-i386//20.08
     runs-on: ubuntu-latest
     container:
       image: docker.io/bilelmoussaoui/flatpak-github-actions
@@ -13,7 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: bilelmoussaoui/flatpak-github-actions@v2
-    - run: flatpak install -y flathub org.freedesktop.Sdk.Compat.i386//20.08 org.freedesktop.Sdk.Extension.toolchain-i386//20.08
       with:
         bundle: "Proton-6.1-GE-2.flatpak"
         manifest-path: "io.github.Proton-6.1-GE-2-wine.yml"
