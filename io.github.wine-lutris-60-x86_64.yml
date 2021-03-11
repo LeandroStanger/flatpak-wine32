@@ -1,0 +1,144 @@
+# main branch - mono installs on demand by winetricks
+app-id: io.github.wine-lutris-60-x86_64
+base-version: '20.08'
+runtime: org.freedesktop.Platform
+runtime-version: '20.08'
+sdk: org.freedesktop.Sdk
+command: wine
+default-branch: stable
+separate-locales: false
+
+rename-desktop-file: wine.desktop
+
+
+# Support 32-bit at runtime
+add-extensions:
+  org.freedesktop.Platform.Compat.i386:
+    directory: lib/i386-linux-gnu
+    version: '20.08'
+
+  org.gnome.Platform.Compat.i386.Debug:
+    directory: lib/debug/lib/i386-linux-gnu
+    version: '20.08'
+    no-autodownload: false
+
+  org.freedesktop.Platform.GL32:
+    directory: lib/i386-linux-gnu/GL
+    versions: "20.08;1.4"
+    version: '1.4'
+    subdirectories: true
+    no-autodownload: false
+    autodelete: false
+    add-ld-path: lib
+    merge-dirs: vulkan/icd.d;glvnd/egl_vendor.d;OpenCL/vendors;lib/dri;lib/d3d;vulkan/explicit_layer.d
+    download-if: active-gl-driver
+    enable-if: active-gl-driver
+    
+  org.freedesktop.Platform.VAAPI.Intel:
+      directory: lib/dri/intel-vaapi-driver
+      autodelete: false
+      no-autodownload: true
+      download-if: have-intel-gpu
+
+# Support 32-bit at buildtime
+sdk-extensions:
+  - org.freedesktop.Sdk.Compat.i386
+  - org.freedesktop.Sdk.Extension.toolchain-i386
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --share=network
+  - --socket=pulseaudio
+  - --allow=multiarch
+  - --allow=devel
+  - --talk-name=org.freedesktop.Notifications
+  - --filesystem=host
+  - --device=all
+  # Persist Wineprefix as ~/.var/app/{fightcade}/.wine
+  - --persist=.wine
+  # Skip Gecko and Mono popups when creating Wine prefix
+  - --env=WINEDLLOVERRIDES="mscoree,mshtml="
+  
+  # Support 32-bit runtime
+  - --env=LD_LIBRARY_PATH=/app/lib:/app/lib32
+  
+  - --env=WINE_RESOLUTION=1920x1080
+
+modules:
+  # Create 32-bit directories
+  - name: compat
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/i386-linux-gnu /app/lib/debug/lib/i386-linux-gnu
+
+  - name: wine-lutris-6.0-x86_64
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/i386-linux-gnu /app/lib/debug/lib/i386-linux-gnu
+      - mkdir -p /app/bin /app/lib /app/lib64 /app/share
+      - ls -a
+      - cp -rvf * /app
+
+    sources:
+      - type: archive
+        url: https://github.com/lutris/wine/releases/download/lutris-6.0/wine-lutris-6.0-x86_64.tar.xz
+        sha256: bb489c033eb04f231c61f663640bf94a6ea9d463218ff698b2f104928a2bc9a0
+        
+  - name: winetricks
+    buildsystem: simple
+    build-commands:
+    - make
+    - make PREFIX=/app install
+    - chmod +x /app/bin/winetricks
+    sources:
+    - type: archive
+      url: https://github.com/Winetricks/winetricks/releases/download/20210206/20210206.tar.gz
+      sha256: 705421798b28696f577104ebdf03b068b9343ab096754150f47a6ec06fa8ae65
+  - name: cabextract
+    buildsystem: autotools
+    sources:
+    - type: archive
+      url: https://www.cabextract.org.uk/cabextract-1.6.tar.gz
+      sha256: cee661b56555350d26943c5e127fc75dd290b7f75689d5ebc1f04957c4af55fb
+  
+  #~ - name: wget
+    #~ buildsystem: autotools
+    #~ sources:
+    #~ - type: archive
+      #~ url: https://ftp.gnu.org/gnu/wget/wget-1.19.4.tar.gz
+      #~ sha256: 93fb96b0f48a20ff5be0d9d9d3c4a986b469cb853131f9d5fe4cc9cecbc8b5b5
+      
+  #~ - name: winedesktop
+    #~ buildsystem: simple
+    #~ build-commands:
+    #~ - install -Dm644 
+      #~ /app/share/icons/hicolor/scalable/apps/winetricks.svg
+      #~ /app/share/icons/hicolor/scalable/apps/io.github.flatpak-wine32.svg 
+
+    #~ - desktop-file-edit --set-icon=io.github.flatpak-wine32 /app/share/applications/wine.desktop
+    #~ - desktop-file-edit --set-name=flatpak-wine32 /app/share/applications/wine.desktop
+    
+    #~ - desktop-file-edit --set-name=flatpak-wine32-winetricks 
+                        #~ /app/share/applications/winetricks.desktop
+    #~ - desktop-file-edit --set-icon=io.github.flatpak-wine32-winetricks
+                        #~ /app/share/applications/winetricks.desktop
+    
+    #~ - install -Dm644 /app/share/applications/winetricks.desktop 
+                     #~ /app/share/applications/io.github.flatpak-wine32-winetricks.desktop
+    #~ - install -Dm644
+      #~ /app/share/icons/hicolor/scalable/apps/winetricks.svg
+      #~ /app/share/icons/hicolor/scalable/apps/io.github.flatpak-wine32-winetricks.svg
+      
+      
+cleanup:
+ - /lib/debug
+ - /bin/extresso
+ - /bin/genresscript
+ - /bin/icotool
+ - /bin/wrestool
+ - /share/man
+ - /include 
+ - /share/applications/winetricks.desktop
+ - /app/share/icons/hicolor/scalable/apps/winetricks.svg
+ - /app/share/applications/winetricks.desktop
